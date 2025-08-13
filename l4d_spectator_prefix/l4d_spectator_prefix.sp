@@ -7,7 +7,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.0"
+#define PLUGIN_VERSION "1.0"
 
 public Plugin myinfo = 
 {
@@ -18,9 +18,7 @@ public Plugin myinfo =
 	url = "https://steamcommunity.com/id/Si_Xin/"
 };
 
-// ===================================================================
-// Variables
-// ===================================================================
+
 
 #define L4D2Team_None 0
 #define L4D2Team_Spectator 1
@@ -29,12 +27,12 @@ public Plugin myinfo =
 
 ConVar g_cvPrefixType;
 ConVar g_cvPrefixTypeCaster;
-ConVar g_cvPrefixTypeAdmin; // 新增管理员前缀
+ConVar g_cvPrefixTypeAdmin;
 ConVar g_cvSupressMsg;
 
 char g_sPrefixType[32];
 char g_sPrefixTypeCaster[32];
-char g_sPrefixTypeAdmin[32]; // 新增管理员前缀
+char g_sPrefixTypeAdmin[32];
 bool g_bSupress;
 
 StringMap g_triePrefixed;
@@ -42,9 +40,7 @@ StringMap g_triePrefixed;
 bool casterAvailable;
 bool g_bLateLoad;
 
-// ===================================================================
-// Plugin Setup / Backup
-// ===================================================================
+
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -54,14 +50,14 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
-	g_cvPrefixType		= CreateConVar("sp_prefix_type",		"(S)",	"普通旁观者前缀", FCVAR_PRINTABLEONLY);
-	g_cvPrefixTypeCaster 	= CreateConVar("sp_prefix_type_caster",	"(C)",	"解说员前缀", FCVAR_PRINTABLEONLY);
-	g_cvPrefixTypeAdmin 	= CreateConVar("sp_prefix_type_admin",	"(A)",	"管理员旁观者前缀", FCVAR_PRINTABLEONLY); // 新增管理员前缀
-	g_cvSupressMsg		= CreateConVar("sp_supress_msg",		"1",	"是否抑制前缀更改通知", _, true, 0.0, true, 1.0);
+	g_cvPrefixType		= CreateConVar("sp_prefix_type",		"(S)",	"Spectator Prefix", FCVAR_PRINTABLEONLY);
+	g_cvPrefixTypeCaster 	= CreateConVar("sp_prefix_type_caster",	"(C)",	"Cast Prefix", FCVAR_PRINTABLEONLY);
+	g_cvPrefixTypeAdmin 	= CreateConVar("sp_prefix_type_admin",	"(A)",	"Admin Prefix", FCVAR_PRINTABLEONLY);
+	g_cvSupressMsg		= CreateConVar("sp_supress_msg",		"1",	"whether to supress message of name changing", _, true, 0.0, true, 1.0);
 	//AutoExecConfig(true, "l4d_spectator_prefix");
 	g_cvPrefixType.AddChangeHook(OnConVarChanged);
 	g_cvPrefixTypeCaster.AddChangeHook(OnConVarChanged);
-	g_cvPrefixTypeAdmin.AddChangeHook(OnConVarChanged); // 新增管理员前缀ConVar监听
+	g_cvPrefixTypeAdmin.AddChangeHook(OnConVarChanged);
 	g_cvSupressMsg.AddChangeHook(OnConVarChanged);
 	
 	GetCvars();
@@ -94,23 +90,16 @@ public void OnPluginEnd()
 	}
 }
 
-// ===================================================================
-// Ready Up Available
-// ===================================================================
 
 public void OnAllPluginsLoaded() { casterAvailable = LibraryExists("caster_system"); }
 public void OnLibraryAdded(const char[] name) { if (StrEqual(name, "caster_system")) casterAvailable = true; }
 public void OnLibraryRemoved(const char[] name) { if (StrEqual(name, "caster_system")) casterAvailable = false; }
 
-// ===================================================================
-// Clear Up
-// ===================================================================
+
 
 public void OnMapStart() { g_triePrefixed.Clear(); }
 
-// ===================================================================
-// Get ConVars
-// ===================================================================
+
 
 public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] newValue) { GetCvars(); }
 
@@ -118,22 +107,16 @@ void GetCvars()
 {
 	g_cvPrefixType.GetString(g_sPrefixType, sizeof(g_sPrefixType));
 	g_cvPrefixTypeCaster.GetString(g_sPrefixTypeCaster, sizeof(g_sPrefixTypeCaster));
-	g_cvPrefixTypeAdmin.GetString(g_sPrefixTypeAdmin, sizeof(g_sPrefixTypeAdmin)); // 获取管理员前缀
+	g_cvPrefixTypeAdmin.GetString(g_sPrefixTypeAdmin, sizeof(g_sPrefixTypeAdmin)); 
 	g_bSupress = g_cvSupressMsg.BoolValue;
 }
 
-// ===================================================================
-// 管理员检测函数
-// ===================================================================
 
 bool IsClientAdmin(int client)
 {
 	return CheckCommandAccess(client, "sm_admin", ADMFLAG_GENERIC, false);
 }
 
-// ===================================================================
-// Events
-// ===================================================================
 
 void Event_NameChanged(Event event, const char[] name, bool dontBroadcast)
 {
@@ -149,7 +132,7 @@ void Event_NameChanged(Event event, const char[] name, bool dontBroadcast)
 	char newname[MAX_NAME_LENGTH];
 	event.GetString("newname", newname, sizeof(newname));
 	
-	// Use a delay function to prevent issue
+	
 	DataPack dp = new DataPack();
 	dp.WriteCell(userid);
 	dp.WriteString(newname);
@@ -192,9 +175,6 @@ void Event_PlayerTeam(Event event, const char[] name, bool dontBroadcast)
 	else if (oldteam == L4D2Team_Spectator) RemovePrefix(client);
 }
 
-// ===================================================================
-// Prefix Methods (更新)
-// ===================================================================
 
 void AddPrefix(int client, const char[] newname = "")
 {
@@ -214,8 +194,8 @@ void AddPrefix(int client, const char[] newname = "")
 	
 	g_triePrefixed.SetString(authId, name, true);
 	
-	// 优先级: 管理员 > 解说员 > 普通玩家
-	if (IsClientAdmin(client)) // 管理员检测
+
+	if (IsClientAdmin(client)) 
 	{
 		Format(name, sizeof(name), "%s %s", g_sPrefixTypeAdmin, name);
 		CS_SetClientName(client, name);
@@ -281,9 +261,6 @@ void CS_SetClientName(int client, const char[] name)
 	}
 }
 
-// ===================================================================
-// Helpers
-// ===================================================================
 
 bool HasPrefix(const char[] auth)
 {
