@@ -97,11 +97,13 @@ public void OnAllPluginsLoaded()
 }
 public void OnLibraryAdded(const char[] name) 
 { 
-	if (StrEqual(name, "caster_system")) casterAvailable = true; 
+	if (StrEqual(name, "caster_system")) 
+	casterAvailable = true; 
 }
 public void OnLibraryRemoved(const char[] name) 
 {
-	if (StrEqual(name, "caster_system")) casterAvailable = false; 
+	if (StrEqual(name, "caster_system")) 
+	casterAvailable = false; 
 }
 
 
