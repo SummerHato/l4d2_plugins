@@ -91,17 +91,32 @@ public void OnPluginEnd()
 }
 
 
-public void OnAllPluginsLoaded() { casterAvailable = LibraryExists("caster_system"); }
-public void OnLibraryAdded(const char[] name) { if (StrEqual(name, "caster_system")) casterAvailable = true; }
-public void OnLibraryRemoved(const char[] name) { if (StrEqual(name, "caster_system")) casterAvailable = false; }
+public void OnAllPluginsLoaded() 
+{
+	casterAvailable = LibraryExists("caster_system"); 
+}
+public void OnLibraryAdded(const char[] name) 
+{ 
+	if (StrEqual(name, "caster_system")) casterAvailable = true; 
+}
+public void OnLibraryRemoved(const char[] name) 
+{
+	if (StrEqual(name, "caster_system")) casterAvailable = false; 
+}
 
 
 
-public void OnMapStart() { g_triePrefixed.Clear(); }
+public void OnMapStart() 
+{ 
+	g_triePrefixed.Clear(); 
+}
 
 
 
-public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] newValue) { GetCvars(); }
+public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] newValue) 
+{ 
+	GetCvars(); 
+}
 
 void GetCvars()
 {
