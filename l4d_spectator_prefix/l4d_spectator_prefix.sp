@@ -212,14 +212,14 @@ void AddPrefix(int client, const char[] newname = "")
 	g_triePrefixed.SetString(authId, name, true);
 	
 
-	if (IsClientAdmin(client)) 
-	{
-		Format(name, sizeof(name), "%s %s", g_sPrefixTypeAdmin, name);
-		CS_SetClientName(client, name);
-	}
-	else if (casterAvailable && IsClientCaster(client))
+	if (casterAvailable && IsClientCaster(client)) 
 	{
 		Format(name, sizeof(name), "%s %s", g_sPrefixTypeCaster, name);
+		CS_SetClientName(client, name);
+	}
+	else if (IsClientAdmin(client))
+	{
+		Format(name, sizeof(name), "%s %s", g_sPrefixTypeAdmin, name);
 		CS_SetClientName(client, name);
 	}
 	else
